@@ -15,8 +15,10 @@ public class Signs : TerrariaPlugin
 
     public override void Initialize()
     {
+        //TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
         Directory.CreateDirectory(Path.Combine(TShock.SavePath, this.Name));
-        Commands.ChatCommands.Add(new Command("signs.convert", (args) => {
+        Commands.ChatCommands.Add(new Command("signs.convert", (args) =>
+        {
             using (var writer = File.CreateText(Path.Combine(TShock.SavePath, this.Name, $"signs-transcript-{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture)}.txt")))
             {
                 int signLength = Main.sign.Length;
@@ -31,12 +33,30 @@ public class Signs : TerrariaPlugin
                         nullCount++;
                     else if (sign.text == "")
                         textEmptyCount++;
-                    
+
                 }
                 args.Player.SendSuccessMessage($"{signLength} chests were indexed.\n{nullCount} sign spaces are available on the map.\n{textEmptyCount} signs have no text.");
             }
-            
+
         }, "convertsigns"));
     }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
+        {
+            //TaskScheduler.UnobservedTaskException -= TaskScheduler_UnobservedTaskException;
+        }
+        base.Dispose(disposing);
+    }
+    /*protected void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+    {
+        if (e.Observed == true)
+        {
+            return;
+        }
+        TShock.Log.ConsoleError(e.Exception.Flatten().ToString());
+        e.SetObserved();
+    }*/
 
 }
